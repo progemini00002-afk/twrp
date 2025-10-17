@@ -37,7 +37,14 @@ jobs:
         sudo rm -rf /usr/local/lib/android
         sudo rm -rf /opt/ghc
         sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        sudo rm -rf /usr/local/.ghcup
+        sudo rm -rf /usr/local/share/boost
+        sudo rm -rf /usr/share/swift
+        sudo apt-get clean
         sudo docker image prune --all --force
+        sudo swapoff -a
+        sudo rm -f /swapfile
         echo "Disk space after cleanup:"
         df -h
     
@@ -59,7 +66,7 @@ jobs:
     - name: Sync TWRP source
       run: |
         cd ~/work/twrp
-        repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+        repo sync -c -j2 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune --current-branch
     
     - name: Copy device tree
       run: |
