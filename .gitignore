@@ -1,3 +1,4 @@
+
 # Python
 __pycache__/
 *.py[cod]
@@ -5,8 +6,8 @@ __pycache__/
 *.so
 .Python
 
-# Boot images
-boot.img
+# Boot images (keep original boot.img for reference)
+# boot.img
 boot-original.img
 recovery.img
 *.img.bak
