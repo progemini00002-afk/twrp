@@ -15,7 +15,7 @@ jobs:
     
     steps:
     - name: Checkout Device Tree
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         path: device/realme/RMX3771
     
@@ -55,7 +55,7 @@ jobs:
         cp -r device/realme/RMX3771 ~/work/twrp/device/realme/
     
     - name: Set up ccache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.ccache
         key: ${{ runner.os }}-ccache-${{ github.sha }}
@@ -74,7 +74,7 @@ jobs:
         mka recoveryimage -j$(nproc --all)
     
     - name: Upload recovery image
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: TWRP-RMX3771-${{ github.run_number }}
         path: ~/work/twrp/out/target/product/RMX3771/recovery.img
