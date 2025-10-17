@@ -29,6 +29,18 @@ jobs:
           python-is-python3 openjdk-11-jdk android-tools-adb android-tools-fastboot \
           libncurses5-dev libncurses-dev lib32ncurses-dev
     
+    - name: Free up disk space
+      run: |
+        echo "Disk space before cleanup:"
+        df -h
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+        echo "Disk space after cleanup:"
+        df -h
+    
     - name: Set up repo
       run: |
         mkdir -p ~/bin
@@ -47,7 +59,7 @@ jobs:
     - name: Sync TWRP source
       run: |
         cd ~/work/twrp
-        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+        repo sync -c -j4 --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
     
     - name: Copy device tree
       run: |
