@@ -1,0 +1,36 @@
+# mount point  fstype  device                 device2                        flags
+/boot          emmc    /dev/block/by-name/boot
+/dtbo          emmc    /dev/block/by-name/dtbo                               flags=display="DTBO";backup=1;flashimg=1
+/cache         ext4    /dev/block/by-name/cache
+/recovery      emmc    /dev/block/by-name/recovery                           flags=backup=1
+/data          f2fs    /dev/block/by-name/userdata                           flags=fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0
+/metadata      ext4    /dev/block/by-name/metadata                           flags=display="Metadata";backup=1
+
+# Dynamic Partitions
+system         /system         ext4    logical
+system_ext     /system_ext     ext4    logical
+vendor         /vendor         ext4    logical
+product        /product        ext4    logical
+odm            /odm            ext4    logical
+
+# Persistent
+/persist       ext4    /dev/block/by-name/persist                            flags=display="Persist"
+/persist_image emmc    /dev/block/by-name/persist                            flags=display="Persist Image";backup=1;flashimg=1
+
+# Firmware
+/vbmeta        emmc    /dev/block/by-name/vbmeta                             flags=display="VBMeta";backup=1;flashimg=1
+/vbmeta_system emmc    /dev/block/by-name/vbmeta_system                      flags=display="VBMeta System";backup=1;flashimg=1
+/vbmeta_vendor emmc    /dev/block/by-name/vbmeta_vendor                      flags=display="VBMeta Vendor";backup=1;flashimg=1
+
+# Modem
+/md1img        emmc    /dev/block/by-name/md1img                             flags=display="Modem";backup=1;flashimg=1
+/md1dsp        emmc    /dev/block/by-name/md1dsp                             flags=display="Modem DSP";backup=1;flashimg=1
+
+# SIM
+/nvdata        ext4    /dev/block/by-name/nvdata                             flags=display="NVData";backup=1
+/nvcfg         ext4    /dev/block/by-name/nvcfg                              flags=display="NVConfig";backup=1
+/nvram         emmc    /dev/block/by-name/nvram                              flags=display="NVRam";backup=1;flashimg=1
+
+# Removable storage
+/sdcard1       auto    /dev/block/mmcblk1p1    /dev/block/mmcblk1            flags=display="MicroSD";storage;wipeingui;removable
+/usb_otg       auto    /dev/block/sda1         /dev/block/sda                flags=display="USB-OTG";storage;wipeingui;removable

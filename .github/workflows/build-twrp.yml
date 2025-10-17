@@ -1,0 +1,110 @@
+name: Build TWRP Recovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'device/**'
+      - '.github/workflows/build-twrp.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - name: Checkout Device Tree
+      uses: actions/checkout@v3
+      with:
+        path: device/realme/RMX3771
+    
+    - name: Set up environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc bison build-essential ccache curl flex \
+          g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev \
+          lib32readline-dev lib32z1-dev liblz4-tool libncurses5 libncurses5-dev \
+          libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync \
+          schedtool squashfs-tools xsltproc zip zlib1g-dev python-is-python3 \
+          openjdk-11-jdk android-tools-adb android-tools-fastboot
+    
+    - name: Set up repo
+      run: |
+        mkdir -p ~/bin
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        chmod a+x ~/bin/repo
+        echo "$HOME/bin" >> $GITHUB_PATH
+    
+    - name: Initialize TWRP source
+      run: |
+        mkdir -p ~/work/twrp
+        cd ~/work/twrp
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1 --depth=1
+    
+    - name: Sync TWRP source
+      run: |
+        cd ~/work/twrp
+        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+    
+    - name: Copy device tree
+      run: |
+        mkdir -p ~/work/twrp/device/realme
+        cp -r device/realme/RMX3771 ~/work/twrp/device/realme/
+    
+    - name: Set up ccache
+      uses: actions/cache@v3
+      with:
+        path: ~/.ccache
+        key: ${{ runner.os }}-ccache-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-
+    
+    - name: Build TWRP
+      run: |
+        cd ~/work/twrp
+        export ALLOW_MISSING_DEPENDENCIES=true
+        export USE_CCACHE=1
+        export CCACHE_DIR=~/.ccache
+        ccache -M 10G
+        source build/envsetup.sh
+        lunch twrp_RMX3771-eng
+        mka recoveryimage -j$(nproc --all)
+    
+    - name: Upload recovery image
+      uses: actions/upload-artifact@v3
+      with:
+        name: TWRP-RMX3771-${{ github.run_number }}
+        path: ~/work/twrp/out/target/product/RMX3771/recovery.img
+    
+    - name: Create Release
+      if: github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v1.0-${{ github.run_number }}
+        name: TWRP for Realme 11 Pro 5G (RMX3771)
+        body: |
+          ## TWRP Recovery for Realme 11 Pro 5G (RMX3771)
+          
+          **Build Date**: ${{ github.event.head_commit.timestamp }}
+          **Commit**: ${{ github.sha }}
+          
+          ### Installation
+          ```bash
+          fastboot flash recovery recovery.img
+          fastboot reboot recovery
+          ```
+          
+          ### Features
+          - FBE Decryption support
+          - MTP support
+          - USB OTG support
+          - Backup/Restore
+          - Flash ZIP files
+          
+          ⚠️ **Warning**: Unlock bootloader before flashing!
+        files: ~/work/twrp/out/target/product/RMX3771/recovery.img
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

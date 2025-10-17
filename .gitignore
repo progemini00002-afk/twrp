@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Boot images
+boot.img
+boot-original.img
+recovery.img
+*.img.bak
+
+# Build outputs
+out/
+*.log
+
+# Extracted files (keep prebuilt folder but ignore large extracted files)
+device/realme/RMX3771/prebuilt/ramdisk/
+*.extracted
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+check_boot.py
+extract_boot.py
